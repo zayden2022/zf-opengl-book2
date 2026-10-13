@@ -4,6 +4,7 @@ BIN_PATH := ./a.out
 build:
 	g++ \
 		main.cpp \
+		program.cpp \
 		utils.cpp \
 		-ldl \
 		$$(pkg-config --cflags --libs glew) \
