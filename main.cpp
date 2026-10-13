@@ -3,6 +3,8 @@
 #include <fstream>
 #include <iostream>
 
+#include "utils.h"
+
 #define numVAOs 1
 
 static GLuint renderingProgram;
@@ -11,63 +13,6 @@ static GLuint vao[numVAOs];
 static void processInput_basic(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-}
-
-static std::string readShaderSource(const char *filePath) {
-    std::string content;
-    std::ifstream fileStream(filePath, std::ios::in);
-    if (!fileStream)
-        throw std::runtime_error(std::string("Failed to open: ") + filePath);
-    std::string line = "";
-    while (!fileStream.eof()) {
-        getline(fileStream, line);
-        content.append(line + "\n");
-    }
-    fileStream.close();
-    return content;
-}
-
-static void printShaderLog(GLuint shader) {
-    int len = 0;
-    int chWrittn = 0;
-    char *log;
-    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
-    // glGetShaderiv — Returns a parameter from a shader object
-    // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetShader.xhtml
-    if (len > 0) {
-        log = (char *)malloc(len);
-        glGetShaderInfoLog(shader, len, &chWrittn, log);
-        // glGetShaderInfoLog — Returns the information log for a shader object
-        // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetShaderInfoLog.xhtml
-        std::cout << "Shader Info Log: " << log << std::endl;
-        free(log);
-    }
-}
-
-static void printProgramLog(int prog) {
-    int len = 0;
-    int chWrittn = 0;
-    char *log;
-    glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &len);
-    if (len > 0) {
-        log = (char *)malloc(len);
-        glGetProgramInfoLog(prog, len, &chWrittn, log);
-        std::cout << "Program Info Log: " << log << std::endl;
-        free(log);
-    }
-}
-
-static bool checkOpenGLError() {
-    bool foundError = false;
-    int glErr = glGetError();
-    // glGetError — return error information
-    // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetError.xhtml
-    while (glErr != GL_NO_ERROR) {
-        std::cout << "glError: " << glErr << std::endl;
-        foundError = true;
-        glErr = glGetError();
-    }
-    return foundError;
 }
 
 /**
