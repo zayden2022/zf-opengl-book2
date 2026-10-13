@@ -16,63 +16,12 @@ static void processInput_basic(GLFWwindow *window) {
 }
 
 /**
- * Creates a shader program that positions vertices at the clip-space origin
- * and outputs opaque blue fragments. Requires a current OpenGL context and
- * initialized GLEW. Shader and program objects are left allocated.
- * @return The program handle.
- */
-static GLuint createShaderProgram() {
-    GLint vertCompiled;
-    GLint fragCompiled;
-    GLint linked;
-
-    GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
-    GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
-    GLuint vfprogram = glCreateProgram();
-
-    std::string vertShaderStr = readShaderSource("ch02/vertShader.glsl");
-    std::string fragShaderStr = readShaderSource("ch02/fragShader.glsl");
-    const char *vertShaderSrc = vertShaderStr.c_str();
-    const char *fragShaderSrc = fragShaderStr.c_str();
-
-    glShaderSource(vShader, 1, &vertShaderSrc, NULL);
-    glShaderSource(fShader, 1, &fragShaderSrc, NULL);
-    glCompileShader(vShader);
-    checkOpenGLError();
-    glGetShaderiv(vShader, GL_COMPILE_STATUS, &vertCompiled);
-    if (vertCompiled != 1) {
-        std::cout << "vertex compilation failed" << std::endl;
-        printShaderLog(vShader);
-    }
-
-    glCompileShader(fShader);
-    checkOpenGLError();
-    glGetShaderiv(fShader, GL_COMPILE_STATUS, &fragCompiled);
-    if (fragCompiled != 1) {
-        std::cout << "fragment compilation failed " << std::endl;
-        printShaderLog(fShader);
-    }
-
-    glAttachShader(vfprogram, vShader);
-    glAttachShader(vfprogram, fShader);
-
-    glLinkProgram(vfprogram);
-    checkOpenGLError();
-    glGetProgramiv(vfprogram, GL_LINK_STATUS, &linked);
-    if (linked != 1) {
-        std::cout << "linking failed" << std::endl;
-        printProgramLog(vfprogram);
-    }
-    return vfprogram;
-}
-
-/**
  * Initializes the global rendering program and creates and binds a vertex array
  * in the current OpenGL context. Requires initialized GLEW.
  * @param window Unused; initialization uses the current context.
  */
 static void init(GLFWwindow *window) {
-    renderingProgram = createShaderProgram();
+    renderingProgram = createShaderProgram("ch02/vertShader.glsl", "ch02/fragShader.glsl");
     glGenVertexArrays(numVAOs, vao);
     glBindVertexArray(vao[0]);
 }

@@ -60,13 +60,7 @@ bool checkOpenGLError() {
     return foundError;
 }
 
-/**
- * Creates a shader program that positions vertices at the clip-space origin
- * and outputs opaque blue fragments. Requires a current OpenGL context and
- * initialized GLEW. Shader and program objects are left allocated.
- * @return The program handle.
- */
-static GLuint createShaderProgram() {
+GLuint createShaderProgram(const char *vertShaderPath, const char *fragShaderPath) {
     GLint vertCompiled;
     GLint fragCompiled;
     GLint linked;
@@ -75,8 +69,10 @@ static GLuint createShaderProgram() {
     GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
     GLuint vfprogram = glCreateProgram();
 
-    std::string vertShaderStr = readShaderSource("ch02/vertShader.glsl");
-    std::string fragShaderStr = readShaderSource("ch02/fragShader.glsl");
+    // TODO: unallocate shaders?
+
+    std::string vertShaderStr = readShaderSource(vertShaderPath);
+    std::string fragShaderStr = readShaderSource(fragShaderPath);
     const char *vertShaderSrc = vertShaderStr.c_str();
     const char *fragShaderSrc = fragShaderStr.c_str();
 
