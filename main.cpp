@@ -7,6 +7,13 @@
 GLuint renderingProgram;
 GLuint vao[numVAOs];
 
+/**
+ * Creates a shader program that positions vertices at the clip-space origin
+ * and outputs opaque blue fragments. Requires a current OpenGL context and
+ * initialized GLEW. Shader and program objects are left allocated.
+ * @return The program handle; compilation and linking failures are not checked,
+ * so the handle does not guarantee a usable program.
+ */
 GLuint createShaderProgram() {
     const char *vshaderSource = "#version 430    \n"
                                 "void main(void) \n"
@@ -33,12 +40,24 @@ GLuint createShaderProgram() {
     return vfprogram;
 }
 
+/**
+ * Initializes the global rendering program and creates and binds a vertex array
+ * in the current OpenGL context. Requires initialized GLEW.
+ * @param window Unused; initialization uses the current context.
+ */
 void init(GLFWwindow *window) {
     renderingProgram = createShaderProgram();
     glGenVertexArrays(numVAOs, vao);
     glBindVertexArray(vao[0]);
 }
 
+/**
+ * Clears the current color buffer to opaque black and draws a blue point at the
+ * center, requesting a size of 30 pixels. Requires init() in the current context;
+ * buffer swapping is left to the caller.
+ * @param window Unused; rendering uses the current context.
+ * @param currentTime Unused; rendering does not vary with time.
+ */
 void display(GLFWwindow *window, double currentTime) {
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
