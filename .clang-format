@@ -1,0 +1,19 @@
+BasedOnStyle: LLVM
+ColumnLimit:  100
+IndentWidth: 4
+
+IncludeBlocks: Regroup
+
+IncludeCategories:
+
+  - Regex:           '"*glad.h"'
+    Priority:        6
+
+  - Regex:           '^<'
+    Priority:        10
+
+  - Regex:           '.*'
+    Priority:        30
+
+  - Regex:           '"SDL.*[.]h"'
+    Priority:        60
