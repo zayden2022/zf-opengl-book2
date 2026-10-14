@@ -5,7 +5,7 @@
 
 std::string readShaderSource(const char *filePath);
 void printShaderLog(GLuint shader);
-void printProgramLog(int prog);
+void printProgramLog(GLuint prog);
 bool checkOpenGLError();
 
 /**
