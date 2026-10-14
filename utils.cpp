@@ -78,20 +78,21 @@ GLuint createShaderProgram(const char *vertShaderPath, const char *fragShaderPat
     glCompileShader(vShader);
     checkOpenGLError();
     glGetShaderiv(vShader, GL_COMPILE_STATUS, &vertCompiled);
-    if (vertCompiled != 1) {
+    if (vertCompiled != GL_TRUE) {
         std::cout << "vertex compilation failed" << std::endl;
         printShaderLog(vShader);
-        glDeleteShader(vShader);
-        return 0;
     }
 
     glShaderSource(fShader, 1, &fragShaderSrc, NULL);
     glCompileShader(fShader);
     checkOpenGLError();
     glGetShaderiv(fShader, GL_COMPILE_STATUS, &fragCompiled);
-    if (fragCompiled != 1) {
+    if (fragCompiled != GL_TRUE) {
         std::cout << "fragment compilation failed " << std::endl;
         printShaderLog(fShader);
+    }
+
+    if (vertCompiled != GL_TRUE || fragCompiled != GL_TRUE) {
         glDeleteShader(fShader);
         glDeleteShader(vShader);
         return 0;
@@ -100,7 +101,6 @@ GLuint createShaderProgram(const char *vertShaderPath, const char *fragShaderPat
     GLuint vfprogram = glCreateProgram();
     glAttachShader(vfprogram, vShader);
     glAttachShader(vfprogram, fShader);
-
     glLinkProgram(vfprogram);
     checkOpenGLError();
     glGetProgramiv(vfprogram, GL_LINK_STATUS, &linked);
