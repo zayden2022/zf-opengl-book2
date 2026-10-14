@@ -120,9 +120,6 @@ GLuint createShaderProgram(const char *vertShaderPath, const char *fragShaderPat
         vfprogram = 0;
     }
 
-    // detaching the shaders after linking is not advised (may cause problems on some
-    // mobile platforms), but deleting is a good practice.
-
     glDeleteShader(vShader);
     glDeleteShader(fShader);
 
