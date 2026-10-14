@@ -3,7 +3,8 @@ BIN_PATH := ./a.out
 .PHONY: build
 build:
 	g++ \
-		*.cpp \
+		main.cpp \
+		utils.cpp \
 		-ldl \
 		$$(pkg-config --cflags --libs glew) \
 		$$(pkg-config --cflags --libs glfw3) \
