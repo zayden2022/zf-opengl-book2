@@ -2,49 +2,52 @@
 
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
+#include <vector>
 
 std::string readShaderSource(const char *filePath) {
-    std::string content;
-    std::ifstream fileStream(filePath, std::ios::in);
-    if (!fileStream)
+    std::ifstream fileStream(filePath);
+    if (!fileStream) {
         throw std::runtime_error(std::string("Failed to open: ") + filePath);
-    std::string line = "";
-    while (!fileStream.eof()) {
-        getline(fileStream, line);
-        content.append(line + "\n");
     }
-    fileStream.close();
+
+    std::string content;
+    std::string line;
+
+    while (std::getline(fileStream, line)) {
+        content += line;
+        content += '\n';
+    }
+
     return content;
 }
 
 void printShaderLog(GLuint shader) {
-    int len = 0;
-    int chWrittn = 0;
-    char *log;
+    GLint len = 0;
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
-    // glGetShaderiv — Returns a parameter from a shader object
-    // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetShader.xhtml
-    if (len > 0) {
-        log = (char *)malloc(len);
-        glGetShaderInfoLog(shader, len, &chWrittn, log);
-        // glGetShaderInfoLog — Returns the information log for a shader object
-        // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetShaderInfoLog.xhtml
-        std::cout << "Shader Info Log: " << log << std::endl;
-        free(log);
+
+    if (len <= 1) {
+        return;
     }
+
+    std::vector<char> log(static_cast<std::size_t>(len));
+    GLsizei charsWritten = 0;
+    glGetShaderInfoLog(shader, static_cast<GLsizei>(log.size()), &charsWritten, log.data());
+    std::cerr << "Shader Info Log: " << log.data() << '\n';
 }
 
-void printProgramLog(int prog) {
-    int len = 0;
-    int chWrittn = 0;
-    char *log;
-    glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &len);
-    if (len > 0) {
-        log = (char *)malloc(len);
-        glGetProgramInfoLog(prog, len, &chWrittn, log);
-        std::cout << "Program Info Log: " << log << std::endl;
-        free(log);
+void printProgramLog(GLuint program) {
+    GLint len = 0;
+    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
+
+    if (len <= 1) {
+        return;
     }
+
+    std::vector<char> log(static_cast<std::size_t>(len));
+    GLsizei charsWritten = 0;
+    glGetProgramInfoLog(program, static_cast<GLsizei>(log.size()), &charsWritten, log.data());
+    std::cerr << "Program Info Log: " << log.data() << '\n';
 }
 
 bool checkOpenGLError() {
@@ -53,7 +56,7 @@ bool checkOpenGLError() {
     // glGetError — return error information
     // https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetError.xhtml
     while (glErr != GL_NO_ERROR) {
-        std::cout << "glError: " << glErr << std::endl;
+        std::cerr << "OpenGL error: 0x" << std::hex << glErr << std::dec << '\n';
         foundError = true;
         glErr = glGetError();
     }
@@ -85,7 +88,7 @@ GLuint createShaderProgram(const char *vertShaderPath, const char *fragShaderPat
     checkOpenGLError();
     glGetShaderiv(vShader, GL_COMPILE_STATUS, &vertCompiled);
     if (vertCompiled != GL_TRUE) {
-        std::cout << "vertex compilation failed" << std::endl;
+        std::cerr << "vertex compilation failed" << std::endl;
         printShaderLog(vShader);
     }
 
@@ -94,7 +97,7 @@ GLuint createShaderProgram(const char *vertShaderPath, const char *fragShaderPat
     checkOpenGLError();
     glGetShaderiv(fShader, GL_COMPILE_STATUS, &fragCompiled);
     if (fragCompiled != GL_TRUE) {
-        std::cout << "fragment compilation failed " << std::endl;
+        std::cerr << "fragment compilation failed " << std::endl;
         printShaderLog(fShader);
     }
 
@@ -111,7 +114,7 @@ GLuint createShaderProgram(const char *vertShaderPath, const char *fragShaderPat
     checkOpenGLError();
     glGetProgramiv(vfprogram, GL_LINK_STATUS, &linked);
     if (linked != GL_TRUE) {
-        std::cout << "linking failed" << std::endl;
+        std::cerr << "linking failed" << std::endl;
         printProgramLog(vfprogram);
         glDeleteProgram(vfprogram);
         vfprogram = 0;
