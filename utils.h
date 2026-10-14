@@ -10,6 +10,6 @@ bool checkOpenGLError();
 
 /**
  * Creates a shader program from a vertex and fragment shaders.
- * @return The program handle.
+ * @return The program handle or 0 in case of an error.
  */
 GLuint createShaderProgram(const char *vertShaderPath, const char *fragShaderPath);

@@ -65,44 +65,57 @@ GLuint createShaderProgram(const char *vertShaderPath, const char *fragShaderPat
     GLint fragCompiled;
     GLint linked;
 
-    GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
-    GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
-    GLuint vfprogram = glCreateProgram();
-
-    // TODO: unallocate shaders?
-
     std::string vertShaderStr = readShaderSource(vertShaderPath);
     std::string fragShaderStr = readShaderSource(fragShaderPath);
+
+    GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
+    GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
+
     const char *vertShaderSrc = vertShaderStr.c_str();
     const char *fragShaderSrc = fragShaderStr.c_str();
 
     glShaderSource(vShader, 1, &vertShaderSrc, NULL);
-    glShaderSource(fShader, 1, &fragShaderSrc, NULL);
     glCompileShader(vShader);
     checkOpenGLError();
     glGetShaderiv(vShader, GL_COMPILE_STATUS, &vertCompiled);
     if (vertCompiled != 1) {
         std::cout << "vertex compilation failed" << std::endl;
         printShaderLog(vShader);
+        glDeleteShader(vShader);
+        return 0;
     }
 
+    glShaderSource(fShader, 1, &fragShaderSrc, NULL);
     glCompileShader(fShader);
     checkOpenGLError();
     glGetShaderiv(fShader, GL_COMPILE_STATUS, &fragCompiled);
     if (fragCompiled != 1) {
         std::cout << "fragment compilation failed " << std::endl;
         printShaderLog(fShader);
+        glDeleteShader(fShader);
+        glDeleteShader(vShader);
+        return 0;
     }
 
+    GLuint vfprogram = glCreateProgram();
     glAttachShader(vfprogram, vShader);
     glAttachShader(vfprogram, fShader);
 
     glLinkProgram(vfprogram);
     checkOpenGLError();
     glGetProgramiv(vfprogram, GL_LINK_STATUS, &linked);
-    if (linked != 1) {
+    if (linked != GL_TRUE) {
         std::cout << "linking failed" << std::endl;
         printProgramLog(vfprogram);
+        glDeleteProgram(vfprogram);
+        vfprogram = 0;
     }
+
+    // detaching the shaders after linking is not advised (may cause problems on some
+    // mobile platforms), but deleting is a good practice.
+
+    glDeleteShader(vShader);
+    glDeleteShader(fShader);
+
     return vfprogram;
 }
