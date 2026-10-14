@@ -65,9 +65,15 @@ GLuint createShaderProgram(const char *vertShaderPath, const char *fragShaderPat
     GLint fragCompiled;
     GLint linked;
 
-    std::string vertShaderStr = readShaderSource(vertShaderPath);
-    std::string fragShaderStr = readShaderSource(fragShaderPath);
-
+    std::string vertShaderStr;
+    std::string fragShaderStr;
+    try {
+        vertShaderStr = readShaderSource(vertShaderPath);
+        fragShaderStr = readShaderSource(fragShaderPath);
+    } catch (const std::exception &e) {
+        std::cerr << "Error reading shader: " << e.what() << std::endl;
+        return 0;
+    }
     GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
     GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
 
