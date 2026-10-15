@@ -47,7 +47,7 @@ void init(GLFWwindow *window) {
     renderingProgram = createShaderProgram("ch04/vertShader.glsl", "ch04/fragShader.glsl");
     cameraX = 0.0f;
     cameraY = 0.0f;
-    cameraZ = 8.0f;
+    cameraZ = 40.0f;
     cubeLocX = 0.0f;
     cubeLocY = -2.0f;
     cubeLocZ = 0.0f;
@@ -69,32 +69,36 @@ void display(GLFWwindow *window, double currentTime) {
 
     vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
 
-    // mMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
-    {
-        // use current time to compute different translations in x, y, and z
-        glm::mat4 tMat = glm::translate(glm::mat4(1.0f), glm::vec3(sin(0.35f * currentTime) * 2.0f,
-                                                                   cos(0.52f * currentTime) * 2.0f,
-                                                                   sin(0.7f * currentTime) * 2.0f));
-        glm::mat4 rMat =
-            glm::rotate(glm::mat4(1.0f), 1.75f * (float)currentTime, glm::vec3(0.0f, 1.0f, 0.0f));
-        rMat = glm::rotate(rMat, 1.75f * (float)currentTime, glm::vec3(1.0f, 0.0f, 0.0f));
-        rMat = glm::rotate(rMat, 1.75f * (float)currentTime, glm::vec3(0.0f, 0.0f, 1.0f));
-        // the 1.75 adjusts the rotation speed
+    for (int i = 0; i < 48; i++) {
+        float tf = currentTime + i; // time factor
 
-        mMat = tMat * rMat;
+        // mMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
+        {
+            // use current time to compute different translations in x, y, and z
+            glm::mat4 tMat = glm::translate(
+                glm::mat4(1.0f),
+                glm::vec3(sin(0.35f * tf) * 8.0f, cos(0.52f * tf) * 8.0f, sin(0.7f * tf) * 8.0f));
+            glm::mat4 rMat =
+                glm::rotate(glm::mat4(1.0f), 1.75f * (float)tf, glm::vec3(0.0f, 1.0f, 0.0f));
+            rMat = glm::rotate(rMat, 1.75f * (float)tf, glm::vec3(1.0f, 0.0f, 0.0f));
+            rMat = glm::rotate(rMat, 1.75f * (float)tf, glm::vec3(0.0f, 0.0f, 1.0f));
+            // the 1.75 adjusts the rotation speed
+
+            mMat = tMat * rMat;
+        }
+
+        mvMat = vMat * mMat;
+
+        glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
+        glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(pMat));
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+        glEnableVertexAttribArray(0);
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
+
+        glDrawArrays(GL_TRIANGLES, 0, 36);
     }
-
-    mvMat = vMat * mMat;
-
-    glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
-    glUniformMatrix4fv(pLoc, 1, GL_FALSE, glm::value_ptr(pMat));
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-    glEnableVertexAttribArray(0);
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-
-    glDrawArrays(GL_TRIANGLES, 0, 36);
 }
