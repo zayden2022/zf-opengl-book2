@@ -21,4 +21,4 @@ clean:
 
 .PHONY: install-deps
 install-deps:
-	sudo apt install libglfw3-dev libglew-dev
+	sudo apt install libglfw3-dev libglew-dev libglm-dev
