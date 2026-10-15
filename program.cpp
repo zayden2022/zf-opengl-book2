@@ -56,6 +56,7 @@ void init(GLFWwindow *window) {
 
 void display(GLFWwindow *window, double currentTime) {
     glClear(GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(renderingProgram);
 
@@ -67,7 +68,22 @@ void display(GLFWwindow *window, double currentTime) {
     pMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f);
 
     vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
-    mMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
+
+    // mMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
+    {
+        // use current time to compute different translations in x, y, and z
+        glm::mat4 tMat = glm::translate(glm::mat4(1.0f), glm::vec3(sin(0.35f * currentTime) * 2.0f,
+                                                                   cos(0.52f * currentTime) * 2.0f,
+                                                                   sin(0.7f * currentTime) * 2.0f));
+        glm::mat4 rMat =
+            glm::rotate(glm::mat4(1.0f), 1.75f * (float)currentTime, glm::vec3(0.0f, 1.0f, 0.0f));
+        rMat = glm::rotate(rMat, 1.75f * (float)currentTime, glm::vec3(1.0f, 0.0f, 0.0f));
+        rMat = glm::rotate(rMat, 1.75f * (float)currentTime, glm::vec3(0.0f, 0.0f, 1.0f));
+        // the 1.75 adjusts the rotation speed
+
+        mMat = tMat * rMat;
+    }
+
     mvMat = vMat * mMat;
 
     glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
